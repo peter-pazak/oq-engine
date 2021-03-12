@@ -19,7 +19,8 @@ spatially-distributed ground-shaking intensities.
 """
 import abc
 import numpy
-
+import gstools as gs
+from openquake.hazardlib.geo.utils import OrthographicProjection 
 
 class BaseCorrelationModel(metaclass=abc.ABCMeta):
     """
@@ -264,3 +265,56 @@ def hmcorrelation(sites_or_distances, imt, uncertainty_multiplier=0):
     # Eq. (8)
     res = numpy.exp(-numpy.power((distances / beta), 0.55))
     return res
+
+class GeoStatCorrelationModel(BaseCorrelationModel):
+    """
+    test of GeoStat library
+    """
+    def __init__(self, vs30_clustering):
+        self.vs30_clustering = vs30_clustering
+        self.distance_matrix = {}
+        self.cache = {}
+
+    def apply_correlation(self, sites, imt, residuals, stddev_intra):
+        """
+        Apply correlation to randomly sampled residuals.
+        In this case residuals provided (generated in previous step) are ignored and created inside gstools.
+        See Parent function
+        """
+        # stddev_intra is repeated if it is only 1 value for all the residuals
+        if stddev_intra.shape[0] == 1:
+            stddev_intra = numpy.matlib.repmat(
+                stddev_intra, len(sites), 1)
+        # Reshape 'stddev_intra' if needed
+        stddev_intra = stddev_intra.squeeze()
+        if not stddev_intra.shape:
+            stddev_intra = stddev_intra[None]
+        
+        try: #try load from cache
+            srf = self.cache['srf'+str(imt)] #srf will depend on imt
+        except KeyError: #generate just once
+            # Jayaram and Baker (2009) p. 1700
+            if imt.period < 1:
+                if not self.vs30_clustering:
+                    # case 1, eq. (17)
+                    b = 8.5 + 17.2 * imt.period
+                else:
+                    # case 2, eq. (18)
+                    b = 40.7 - 15.0 * imt.period
+            else:
+                # both cases, eq. (19)
+                b = 22.0 + 3.7 * imt.period
+            model = gs.Exponential(dim=2, var=1, len_scale=b/3.0) #imt dependent (intensity measure type) through different range=len_scale
+            srf = gs.SRF(model)
+            self.cache['srf'+str(imt)] = srf #imt dependence
+        try:
+            seed = self.cache['seed']
+        except KeyError:
+            seed = gs.random.MasterRNG(20170519) #we can think of generating here some random seed
+        op = OrthographicProjection(min(sites.lons),max(sites.lons),min(sites.lats),max(sites.lats))
+        xs, ys = op(sites.lons,sites.lats)
+
+        residuals_correlated = residuals * 0
+        for isim in range(len(residuals[1])):
+          residuals_correlated[0:, isim] = stddev_intra*srf((xs, ys), seed=seed())
+        return residuals_correlated
