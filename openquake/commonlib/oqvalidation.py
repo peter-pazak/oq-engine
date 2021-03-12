@@ -610,7 +610,7 @@ from openquake.sep.classes import SecondaryPeril
 from openquake.commonlib import logictree, util
 from openquake.risklib.riskmodels import get_risk_files
 
-GROUND_MOTION_CORRELATION_MODELS = ['JB2009', 'HM2018']
+GROUND_MOTION_CORRELATION_MODELS = ['JB2009', 'HM2018', 'GeoStat']
 TWO16 = 2 ** 16  # 65536
 TWO32 = 2 ** 32
 U16 = numpy.uint16
