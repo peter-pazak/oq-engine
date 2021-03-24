@@ -19,7 +19,7 @@ spatially-distributed ground-shaking intensities.
 """
 import abc
 import numpy
-
+from numpy import matlib
 
 class BaseCorrelationModel(metaclass=abc.ABCMeta):
     """
@@ -176,7 +176,7 @@ class HM2018CorrelationModel(BaseCorrelationModel):
         """
         # stddev_intra is repeated if it is only 1 value for all the residuals
         if stddev_intra.shape[0] == 1:
-            stddev_intra = numpy.matlib.repmat(
+            stddev_intra = matlib.repmat(
                 stddev_intra, len(sites.complete), 1)
         # Reshape 'stddev_intra' if needed
         stddev_intra = stddev_intra.squeeze()
