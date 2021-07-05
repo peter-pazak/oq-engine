@@ -165,7 +165,7 @@ class CatalogueSelector(object):
         Select earthquakes within polygon
 
         :param polygon:
-            Centre point as instance of nhlib.geo.polygon.Polygon class
+            Centre point as instance of openquake.hazardlib.geo.polygon.Polygon class
 
         :param float distance:
             Buffer distance (km) (can take negative values)
@@ -201,7 +201,7 @@ class CatalogueSelector(object):
         Select earthquakes within a distance from a Point
 
         :param point:
-            Centre point as instance of nhlib.geo.point.Point class
+            Centre point as instance of openquake.hazardlib.geo.point.Point class
 
         :param float distance:
             Distance (km)
@@ -229,7 +229,7 @@ class CatalogueSelector(object):
         Select earthquakes from within a square centered on a point
 
         :param point:
-            Centre point as instance of nhlib.geo.point.Point class
+            Centre point as instance of openquake.hazardlib.geo.point.Point class
 
         :param distance:
             Distance (km)
@@ -266,8 +266,8 @@ class CatalogueSelector(object):
 
         :param surface:
             Fault surface as instance of
-            nhlib.geo.surface.base.SimpleFaultSurface  or as instance of
-            nhlib.geo.surface.ComplexFaultSurface
+            openquake.hazardlib.geo.surface.base.SimpleFaultSurface  or as instance of
+            openquake.hazardlib.geo.surface.ComplexFaultSurface
 
         :param float distance:
             Rupture distance (km)
@@ -292,7 +292,7 @@ class CatalogueSelector(object):
         Select events within a rupture distance from a fault surface
 
         :param surface:
-            Fault surface as instance of nhlib.geo.surface.base.BaseSurface
+            Fault surface as instance of openquake.hazardlib.geo.surface.base.BaseSurface
 
         :param float distance:
             Rupture distance (km)
